@@ -27,6 +27,7 @@ namespace EduApplication.EduApplication.Core.Entities
 
         [StringLength(100)]
         public string? Schedule { get; set; }
+        public int? MaxStudent { get; set; }
 
         public virtual Subject Subject { get; set; }
         public virtual Teacher Teacher { get; set; }
