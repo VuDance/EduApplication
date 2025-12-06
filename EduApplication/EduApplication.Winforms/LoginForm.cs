@@ -2,6 +2,7 @@
 using EduApplication.EduApplication.Data;
 using EduApplication.EduApplication.Services;
 using EduApplication.EduApplication.Winforms.Dtos;
+using EduApplication.EduApplication.Winforms.Report;
 using EduApplication.EduApplication.Winforms.Shared;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,7 +38,7 @@ namespace EduApplication.EduApplication.Winforms
             if (await _authService.LoginAsync(username, password))
             {
                 var user = await _authService.GetUserByUsernameAsync(username);
-                if(!user.IsActive)
+                if (!user.IsActive)
                 {
                     MessageBox.Show("Tài khoản đã bị vô hiệu hóa!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
@@ -60,5 +61,13 @@ namespace EduApplication.EduApplication.Winforms
                 MessageBox.Show("Sai tài khoản hoặc mật khẩu!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            AttendenceForm f = new AttendenceForm();
+            f.Show();          // mở không chặn
+                               // f.ShowDialog(); // nếu muốn mở dạng modal
+        }
+
     }
 }

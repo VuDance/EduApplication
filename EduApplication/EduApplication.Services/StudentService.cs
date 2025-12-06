@@ -46,6 +46,14 @@ namespace EduApplication.EduApplication.Services
             return await _context.Students
                 .ToListAsync();
         }
+        public async Task<List<Student>> SearchStudentsAsync(string keyword)
+        {
+            return await _context.Students
+                .Where(s => s.FullName.Contains(keyword) ||
+                            s.Email.Contains(keyword) ||
+                            s.PhoneNumber.Contains(keyword))
+                .ToListAsync();
+        }
         public async Task<Student> UpdateStudentAsync(StudentDto studentDto)
         {
             var student = await _context.Students.FindAsync(studentDto.Id);

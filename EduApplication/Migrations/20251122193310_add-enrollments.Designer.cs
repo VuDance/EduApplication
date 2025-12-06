@@ -4,6 +4,7 @@ using EduApplication.EduApplication.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduApplication.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251122193310_add-enrollments")]
+    partial class addenrollments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,35 +24,6 @@ namespace EduApplication.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("EduApplication.EduApplication.Core.Entities.Attendance", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ClassId")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClassId");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("Attendances");
-                });
 
             modelBuilder.Entity("EduApplication.EduApplication.Core.Entities.Class", b =>
                 {
@@ -264,29 +238,10 @@ namespace EduApplication.Migrations
                         {
                             Id = 1,
                             IsActive = true,
-                            PasswordHash = "$2a$11$AAUz.tj5.gVXwTso8wzqh.EiUB8N05ZbvU1OeEkV.ikDxUwpIslFi",
+                            PasswordHash = "$2a$11$IyW98YeMDl4VtwikJzbw1.Cx/rHbCdQ.YK4Cnal5EELGc.N2HAU3i",
                             Role = 0,
                             Username = "admin"
                         });
-                });
-
-            modelBuilder.Entity("EduApplication.EduApplication.Core.Entities.Attendance", b =>
-                {
-                    b.HasOne("EduApplication.EduApplication.Core.Entities.Class", "Class")
-                        .WithMany("Attendances")
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("EduApplication.EduApplication.Core.Entities.Student", "Student")
-                        .WithMany("Attendances")
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Class");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("EduApplication.EduApplication.Core.Entities.Class", b =>
@@ -351,15 +306,11 @@ namespace EduApplication.Migrations
 
             modelBuilder.Entity("EduApplication.EduApplication.Core.Entities.Class", b =>
                 {
-                    b.Navigation("Attendances");
-
                     b.Navigation("Enrollments");
                 });
 
             modelBuilder.Entity("EduApplication.EduApplication.Core.Entities.Student", b =>
                 {
-                    b.Navigation("Attendances");
-
                     b.Navigation("Enrollments");
                 });
 

@@ -16,5 +16,7 @@ namespace EduApplication.EduApplication.Core.Entities
         public DateTime RegisterDate { get; set; } = DateTime.Now;
         public int UserId { get; set; }
         public virtual required User User { get; set; }
+        public ICollection<Enrollment> Enrollments { get; set; }
+        public ICollection<Attendance> Attendances { get; set; }
     }
 }

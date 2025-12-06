@@ -15,6 +15,8 @@ namespace EduApplication.EduApplication.Data
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<Class> Classes { get; set; }
+        public DbSet<Enrollment> Enrollments { get; set; }
+        public DbSet<Attendance> Attendances { get; set; }
         //public DbSet<Question> Questions { get; set; }
         //public DbSet<Answer> Answers { get; set; }
         //public DbSet<Exam> Exams { get; set; }
@@ -35,7 +37,29 @@ namespace EduApplication.EduApplication.Data
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Username)
                 .IsUnique();
+            modelBuilder.Entity<Enrollment>()
+                .HasOne(e => e.Student)
+                .WithMany(s => s.Enrollments)
+                .HasForeignKey(e => e.StudentId)
+                .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Enrollment>()
+                .HasOne(e => e.Class)
+                .WithMany(c => c.Enrollments)
+                .HasForeignKey(e => e.ClassId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Attendance>()
+                .HasOne(a => a.Student)
+                .WithMany(s => s.Attendances)
+                .HasForeignKey(a => a.StudentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Attendance>()
+                .HasOne(a => a.Class)
+                .WithMany(c => c.Attendances)
+                .HasForeignKey(a => a.ClassId)
+                .OnDelete(DeleteBehavior.Restrict);
             // seed admin
             modelBuilder.Entity<User>().HasData(new User
             {

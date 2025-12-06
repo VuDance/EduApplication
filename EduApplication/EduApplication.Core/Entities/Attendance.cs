@@ -10,9 +10,10 @@ namespace EduApplication.EduApplication.Core.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public int StudentId { get; set; }
-        public int SessionId { get; set; }
+        public int ClassId { get; set; }
+        public DateOnly Date { get; set; }
         public AttendanceStatus Status { get; set; }
-        public virtual required Student Student { get; set; }
-        public virtual required Session Session { get; set; }
+        public virtual Student Student { get; set; }
+        public virtual Class Class { get; set; }
     }
 }

@@ -97,6 +97,8 @@ namespace EduApplication.EduApplication.Winforms.Controls
                 contextMenu.Items.Add("✏️ Edit", null, (s, ev) => EditClass(id));
                 contextMenu.Items.Add("🗑️ Delete", null, async (s, ev) => await DeleteClass(id));
                 contextMenu.Items.Add("ℹ️ View Details", null, (s, ev) => ViewClass(id));
+                contextMenu.Items.Add("+ Add Student", null, (s, ev) => AddStudent(id));
+                contextMenu.Items.Add("+ Attendance", null, (s, ev) => Attendance(id));
 
                 var cellRect = dataGridView1.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, true);
                 var location = new Point(cellRect.Left, cellRect.Bottom);
@@ -111,6 +113,14 @@ namespace EduApplication.EduApplication.Winforms.Controls
             }
         }
 
+        private void Attendance(int id)
+        {
+            if (this.FindForm() is MainForm mainForm)
+            {
+                mainForm.LoadContent(new AttendanceControl(id));
+            }
+        }
+
         private async Task DeleteClass(int id)
         {
             var confirm = MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận", MessageBoxButtons.YesNo);
@@ -118,6 +128,14 @@ namespace EduApplication.EduApplication.Winforms.Controls
             {
                 await _classService.DeleteClassAsync(id);
                 await LoadClassesAsync();
+            }
+        }
+
+        private void AddStudent(int id)
+        {
+            if (this.FindForm() is MainForm mainForm)
+            {
+                mainForm.LoadContent(new AssignStudentControl(id));
             }
         }
 

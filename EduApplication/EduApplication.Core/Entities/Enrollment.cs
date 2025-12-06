@@ -12,7 +12,7 @@ namespace EduApplication.EduApplication.Core.Entities
         public int StudentId { get; set; }
         public int ClassId { get; set; }
         public StudentStatus Status { get; set; }
-        public virtual required Student Student { get; set; }
-        public virtual required Class Class { get; set; }
+        public virtual Student Student { get; set; }
+        public virtual Class Class { get; set; }
     }
 }

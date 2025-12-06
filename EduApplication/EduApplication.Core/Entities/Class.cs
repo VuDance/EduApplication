@@ -31,5 +31,7 @@ namespace EduApplication.EduApplication.Core.Entities
 
         public virtual Subject Subject { get; set; }
         public virtual Teacher Teacher { get; set; }
+        public ICollection<Enrollment> Enrollments { get; set; }
+        public ICollection<Attendance> Attendances { get; set; }
     }
 }
