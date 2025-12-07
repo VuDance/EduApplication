@@ -16,6 +16,7 @@ namespace EduApplication.EduApplication.Services
             return await _context.Classes
                 .Include(x => x.Subject)
                 .Include(x => x.Teacher)
+                .Include(x => x.Enrollments)
                 .ToListAsync();
         }
         public async Task<Core.Entities.Class> GetClassByIdAsync(int id)

@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             panel1 = new Panel();
+            button1 = new Button();
             button3 = new Button();
             label1 = new Label();
             button2 = new Button();
@@ -41,6 +42,7 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(button1);
             panel1.Controls.Add(button3);
             panel1.Controls.Add(label1);
             panel1.Controls.Add(button2);
@@ -50,11 +52,21 @@
             panel1.Size = new Size(595, 60);
             panel1.TabIndex = 0;
             // 
+            // button1
+            // 
+            button1.Location = new Point(449, 16);
+            button1.Name = "button1";
+            button1.Size = new Size(81, 30);
+            button1.TabIndex = 11;
+            button1.Text = "Xuất excel";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
             // button3
             // 
-            button3.Location = new Point(478, 16);
+            button3.Location = new Point(536, 16);
             button3.Name = "button3";
-            button3.Size = new Size(114, 30);
+            button3.Size = new Size(56, 30);
             button3.TabIndex = 10;
             button3.Text = "Lưu";
             button3.UseVisualStyleBackColor = true;
@@ -80,6 +92,7 @@
             button2.TabIndex = 8;
             button2.Text = "<<";
             button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
             // 
             // panel2
             // 
@@ -122,5 +135,6 @@
         private Label label1;
         private Button button3;
         private DataGridView dataGridView1;
+        private Button button1;
     }
 }

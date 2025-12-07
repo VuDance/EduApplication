@@ -1,8 +1,12 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Threading.Tasks;
 using EduApplication.EduApplication.Services;
 using EduApplication.EduApplication.Winforms.Dtos;
+using EduApplication.EduApplication.Winforms.Shared.Enums;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 
 namespace EduApplication.EduApplication.Winforms.Controls.Class
 {
@@ -96,6 +100,88 @@ namespace EduApplication.EduApplication.Winforms.Controls.Class
             }
             await _attendanceService.UpdateAttendanceAsync(listAttendance);
             MessageBox.Show("Cập nhật điểm danh thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var dt = ExecuteStoredProcedure(
+                "proc_GetAttendence",
+                new SqlParameter("@ClassId", _classId),
+                new SqlParameter("@Date", DateOnly.FromDateTime(DateTime.Now.Date))
+            );
+
+            if (dt.Rows.Count == 0)
+            {
+                MessageBox.Show("Không có dữ liệu.");
+                return;
+            }
+
+            using (SaveFileDialog sfd = new SaveFileDialog())
+            {
+                sfd.Filter = "Excel file|*.xlsx";
+                sfd.FileName = "BaoCao.xlsx";
+
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    ExportToExcel(dt, sfd.FileName);
+                    MessageBox.Show("Xuất Excel thành công!");
+                }
+            }
+        }
+        public static DataTable ExecuteStoredProcedure(string procName, params SqlParameter[] parameters)
+        {
+            var dt = new DataTable();
+
+            using (SqlConnection conn = new SqlConnection(Properties.Settings.Default.DefaultConnection))
+            using (SqlCommand cmd = new SqlCommand(procName, conn))
+            using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                if (parameters != null)
+                    cmd.Parameters.AddRange(parameters);
+
+                conn.Open();
+                da.Fill(dt);
+            }
+
+            return dt;
+        }
+        public static void ExportToExcel(DataTable dt, string filePath)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            using (var package = new ExcelPackage())
+            {
+                var ws = package.Workbook.Worksheets.Add("Data");
+
+                // ---- HEADER ----
+                ws.Cells[1, 1].Value = "Họ và tên";
+                ws.Cells[1, 2].Value = "Trạng thái";
+                ws.Cells[1, 3].Value = "Email";
+
+                // ---- DATA ----
+                int row = 2;
+
+                foreach (DataRow dr in dt.Rows)
+                {
+                    ws.Cells[row, 1].Value = dr["FullName"];
+                    ws.Cells[row, 2].Value = (AttendanceStatus)dr["Status"] == AttendanceStatus.Absent ? "Vắng" : "Có mặt";
+                    ws.Cells[row, 3].Value = dr["Email"];
+                    row++;
+                }
+
+                ws.Cells.AutoFitColumns();
+                package.SaveAs(new FileInfo(filePath));
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (this.FindForm() is MainForm mainForm)
+            {
+                mainForm.LoadContent(new ClassControl());
+            }
         }
     }
 }

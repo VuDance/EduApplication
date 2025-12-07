@@ -1,7 +1,10 @@
 ﻿using System.Data;
+using EduApplication.EduApplication.Core.Entities;
 using EduApplication.EduApplication.Data;
 using EduApplication.EduApplication.Services;
 using EduApplication.EduApplication.Winforms.Controls.Class;
+using EduApplication.EduApplication.Winforms.Shared;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace EduApplication.EduApplication.Winforms.Controls
@@ -84,7 +87,7 @@ namespace EduApplication.EduApplication.Winforms.Controls
             }
         }
 
-        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        private async void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0 || e.ColumnIndex < 0)
                 return;
@@ -94,11 +97,35 @@ namespace EduApplication.EduApplication.Winforms.Controls
                 int id = (int)dataGridView1.Rows[e.RowIndex].Cells["Id"].Value;
 
                 var contextMenu = new ContextMenuStrip();
-                contextMenu.Items.Add("✏️ Edit", null, (s, ev) => EditClass(id));
-                contextMenu.Items.Add("🗑️ Delete", null, async (s, ev) => await DeleteClass(id));
-                contextMenu.Items.Add("ℹ️ View Details", null, (s, ev) => ViewClass(id));
-                contextMenu.Items.Add("+ Add Student", null, (s, ev) => AddStudent(id));
-                contextMenu.Items.Add("+ Attendance", null, (s, ev) => Attendance(id));
+                var itemEdit = contextMenu.Items.Add("✏️ Sửa", null, (s, ev) => EditClass(id));
+                itemEdit.Name = "Edit";
+
+                var itemDelete = contextMenu.Items.Add("🗑️ Xóa", null, async (s, ev) => await DeleteClass(id));
+                itemDelete.Name = "Delete";
+
+                var itemInfo = contextMenu.Items.Add("ℹ️ Xem chi tiết", null, (s, ev) => ViewClass(id));
+                itemInfo.Name = "Info";
+
+                var itemAddStudent = contextMenu.Items.Add("+ Thêm học sinh", null, (s, ev) => AddStudent(id));
+                itemAddStudent.Name = "AddStudent";
+
+                var itemAttendance = contextMenu.Items.Add("+ Điểm danh", null, (s, ev) => Attendance(id));
+                itemAttendance.Name = "Attendance";
+
+                if (AppSession.CurrentUser.Role != Shared.Enums.Role.Admin)
+                {
+                    contextMenu.Items["Edit"].Visible = false;
+                    contextMenu.Items["Delete"].Visible = false;
+                }
+
+                if(AppSession.CurrentUser.Role == Shared.Enums.Role.Student)
+                {
+                    var itemRes = contextMenu.Items.Add("Đăng ký", null, (s, ev) => RegisterClass(id));
+                    itemRes.Name = "Register";
+                    var cls = await _classService.GetAllClassesAsync();
+                    var isRegistered = cls.Any(c => c.ClassId == id && (c.Enrollments?.Any(st => st.StudentId == AppSession.CurrentUser.OrderId) ?? false));
+                    contextMenu.Items["Register"].Enabled = !isRegistered;
+                }
 
                 var cellRect = dataGridView1.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, true);
                 var location = new Point(cellRect.Left, cellRect.Bottom);
@@ -112,7 +139,35 @@ namespace EduApplication.EduApplication.Winforms.Controls
                 mainForm.LoadContent(new ClassCreateControl(id));
             }
         }
+        private async void RegisterClass(int id)
+        {
+            try
+            {
+                using (var conn = new SqlConnection(Properties.Settings.Default.DefaultConnection))
+                using (var cmd = new SqlCommand("sp_EnrollStudentsToClass", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
 
+                    cmd.Parameters.Add(new SqlParameter("@ClassId", id));
+
+                    cmd.Parameters.Add(new SqlParameter("@StudentId", AppSession.CurrentUser.OrderId));
+
+                    await conn.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
+                    MessageBox.Show("Đăng ký lớp học thành công!", "Thông báo",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi đăng ký lớp học: {ex.Message}", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                await LoadClassesAsync();
+            }
+        }
         private void Attendance(int id)
         {
             if (this.FindForm() is MainForm mainForm)

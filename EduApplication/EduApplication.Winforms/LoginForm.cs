@@ -1,8 +1,6 @@
-﻿using EduApplication.EduApplication.Core.Entities;
-using EduApplication.EduApplication.Data;
+﻿using EduApplication.EduApplication.Data;
 using EduApplication.EduApplication.Services;
 using EduApplication.EduApplication.Winforms.Dtos;
-using EduApplication.EduApplication.Winforms.Report;
 using EduApplication.EduApplication.Winforms.Shared;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,6 +49,18 @@ namespace EduApplication.EduApplication.Winforms
                     Role = user.Role,
                     IsActive = user.IsActive
                 };
+
+                if(user.Role == Shared.Enums.Role.Student)
+                {
+                    var student = await _authService.GetStudentAsync(user.Id);
+                    AppSession.CurrentUser.OrderId = student.Id;
+                }
+                else if (user.Role == Shared.Enums.Role.Teacher)
+                {
+                    var teacher = await _authService.GetTeacherAsync(user.Id);
+                    AppSession.CurrentUser.OrderId = teacher.Id;
+                }
+
                 this.Hide();
                 var main = new MainForm();
                 main.FormClosed += (s, args) => this.Close();
@@ -61,13 +71,5 @@ namespace EduApplication.EduApplication.Winforms
                 MessageBox.Show("Sai tài khoản hoặc mật khẩu!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            AttendenceForm f = new AttendenceForm();
-            f.Show();          // mở không chặn
-                               // f.ShowDialog(); // nếu muốn mở dạng modal
-        }
-
     }
 }

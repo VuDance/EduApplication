@@ -24,6 +24,26 @@ namespace EduApplication.EduApplication.Services
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
+        public async Task<Teacher> GetTeacherAsync(int userId)
+        {
+            var teacher = await _context.Teachers
+                .FirstOrDefaultAsync(t => t.UserId == userId);
+            if (teacher == null)
+            {
+                throw new Exception("Teacher not found for the given user ID");
+            }
+            return teacher;
+        }
+        public async Task<Student> GetStudentAsync(int userId)
+        {
+            var student = await _context.Students
+                .FirstOrDefaultAsync(s => s.UserId == userId);
+            if (student == null)
+            {
+                throw new Exception("Student not found for the given user ID");
+            }
+            return student;
+        }
         public async Task<User> CreateUserAsync(User user)
         {
             if (await _context.Users.AnyAsync(u => u.Username == user.Username))
