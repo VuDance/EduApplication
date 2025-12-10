@@ -36,6 +36,9 @@ namespace EduApplication.EduApplication.Winforms
                 button1.Visible = false;
                 button5.Visible = false;
                 button6.Visible = false;
+                if (curUser.Role == Role.Student) {
+                    button2.Text = "Lớp học";
+                }
             }
         }
 

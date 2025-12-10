@@ -45,26 +45,69 @@ namespace EduApplication.EduApplication.Winforms.Controls
 
                 // Gán dữ liệu vào DataGridView
                 dataGridView1.AutoGenerateColumns = true;
-
-                dataGridView1.DataSource = cls.Select(s => new
+                dataGridView1.ReadOnly = true;
+                if (AppSession.CurrentUser.Role == Shared.Enums.Role.Teacher)
                 {
-                    Id = s.ClassId,
-                    ClassName = s.ClassName,
-                    Subject = s.Subject.Name,
-                    Teacher = s.Teacher.FullName,
-                    s.MaxStudent,
-                    Start = s.StartDate.ToShortDateString(),
-                    End = s.EndDate.ToShortDateString()
-                }).ToList();
+                    using (var conn = new SqlConnection(Properties.Settings.Default.DefaultConnection))
+                    using (var cmd = new SqlCommand("GetClassesByTeacherCursor", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@TeacherId", AppSession.CurrentUser.OrderId);
 
-                dataGridView1.Columns["Id"].Visible = false;
-                dataGridView1.Columns["ClassName"].HeaderText = "Tên lớp";
-                dataGridView1.Columns["Subject"].HeaderText = "Môn học";
-                dataGridView1.Columns["Teacher"].HeaderText = "Giáo viên";
-                dataGridView1.Columns["MaxStudent"].HeaderText = "Sĩ số";
-                dataGridView1.Columns["Start"].HeaderText = "Ngày bắt đầu";
-                dataGridView1.Columns["End"].HeaderText = "Ngày kết thúc";
+                        var dt = new DataTable();
+                        using (var da = new SqlDataAdapter(cmd))
+                        {
+                            da.Fill(dt);
+                        }
 
+                        var data = dt.AsEnumerable()
+                         .Select(row => new
+                         {
+                             Id = row.Field<string>("Id"),
+                             ClassName = row.Field<string>("ClassName"),
+                             SubjectName = row.Field<string>("SubjectName"),
+                             TeacherName = row.Field<string>("TeacherName"),
+                             MaxStudent = row.Field<int>("MaxStudent"),
+                             StartDate = row.Field<DateTime>("StartDate").ToShortDateString(),
+                             EndDate = row.Field<DateTime>("EndDate").ToShortDateString()
+                         })
+                         .ToList();
+
+                        // Gán vào DataGridView
+                        dataGridView1.DataSource = data;
+
+
+                        // Thiết lập hiển thị cột
+                        dataGridView1.Columns["Id"].Visible = false;
+                        dataGridView1.Columns["ClassName"].HeaderText = "Tên lớp";
+                        dataGridView1.Columns["SubjectName"].HeaderText = "Môn học";
+                        dataGridView1.Columns["TeacherName"].HeaderText = "Giáo viên";
+                        dataGridView1.Columns["MaxStudent"].HeaderText = "Sĩ số";
+                        dataGridView1.Columns["StartDate"].HeaderText = "Ngày bắt đầu";
+                        dataGridView1.Columns["EndDate"].HeaderText = "Ngày kết thúc";
+                    }
+                }
+                else
+                {
+                    dataGridView1.DataSource = cls.Select(s => new
+                    {
+                        Id = s.ClassId,
+                        ClassName = s.ClassName,
+                        Subject = s.Subject.Name,
+                        Teacher = s.Teacher.FullName,
+                        s.MaxStudent,
+                        Start = s.StartDate.ToShortDateString(),
+                        End = s.EndDate.ToShortDateString()
+                    }).ToList();
+
+                    dataGridView1.Columns["Id"].Visible = false;
+                    dataGridView1.Columns["ClassName"].HeaderText = "Tên lớp";
+                    dataGridView1.Columns["Subject"].HeaderText = "Môn học";
+                    dataGridView1.Columns["Teacher"].HeaderText = "Giáo viên";
+                    dataGridView1.Columns["MaxStudent"].HeaderText = "Sĩ số";
+                    dataGridView1.Columns["Start"].HeaderText = "Ngày bắt đầu";
+                    dataGridView1.Columns["End"].HeaderText = "Ngày kết thúc";
+                }
                 if (!dataGridView1.Columns.Contains("Actions"))
                 {
                     var buttonCol = new DataGridViewButtonColumn
@@ -94,7 +137,7 @@ namespace EduApplication.EduApplication.Winforms.Controls
 
             if (dataGridView1.Columns[e.ColumnIndex].Name == "Actions")
             {
-                int id = (int)dataGridView1.Rows[e.RowIndex].Cells["Id"].Value;
+                int id = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["Id"].Value);
 
                 var contextMenu = new ContextMenuStrip();
                 var itemEdit = contextMenu.Items.Add("✏️ Sửa", null, (s, ev) => EditClass(id));
@@ -116,6 +159,7 @@ namespace EduApplication.EduApplication.Winforms.Controls
                 {
                     contextMenu.Items["Edit"].Visible = false;
                     contextMenu.Items["Delete"].Visible = false;
+                    contextMenu.Items["AddStudent"].Visible = false;
                 }
 
                 if(AppSession.CurrentUser.Role == Shared.Enums.Role.Student)
@@ -125,6 +169,7 @@ namespace EduApplication.EduApplication.Winforms.Controls
                     var cls = await _classService.GetAllClassesAsync();
                     var isRegistered = cls.Any(c => c.ClassId == id && (c.Enrollments?.Any(st => st.StudentId == AppSession.CurrentUser.OrderId) ?? false));
                     contextMenu.Items["Register"].Enabled = !isRegistered;
+                    contextMenu.Items["Attendance"].Visible = false;
                 }
 
                 var cellRect = dataGridView1.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, true);
