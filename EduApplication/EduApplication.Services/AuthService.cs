@@ -55,5 +55,16 @@ namespace EduApplication.EduApplication.Services
             await _context.SaveChangesAsync();
             return user;
         }
+        public async Task<bool> ChangePassword(int id, string password)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if (user == null)
+            {
+                throw new Exception("User not exist");
+            }
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

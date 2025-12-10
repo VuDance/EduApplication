@@ -63,7 +63,7 @@ namespace EduApplication.EduApplication.Winforms
 
                 this.Hide();
                 var main = new MainForm();
-                main.FormClosed += (s, args) => this.Close();
+                main.FormClosed += (s, args) => this.Hide();
                 main.Show();
             }
             else

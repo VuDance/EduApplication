@@ -264,7 +264,7 @@ namespace EduApplication.Migrations
                         {
                             Id = 1,
                             IsActive = true,
-                            PasswordHash = "$2a$11$AAUz.tj5.gVXwTso8wzqh.EiUB8N05ZbvU1OeEkV.ikDxUwpIslFi",
+                            PasswordHash = "$2a$11$ChMwnQhCQRBdBXx7EeNfw.IdKVOQ4XPlSmG5YG.k5NcTeiUonjeHO",
                             Role = 0,
                             Username = "admin"
                         });

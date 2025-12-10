@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduApplication.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251122210238_add-attendance")]
-    partial class addattendance
+    [Migration("20251209152924_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -267,7 +267,7 @@ namespace EduApplication.Migrations
                         {
                             Id = 1,
                             IsActive = true,
-                            PasswordHash = "$2a$11$AAUz.tj5.gVXwTso8wzqh.EiUB8N05ZbvU1OeEkV.ikDxUwpIslFi",
+                            PasswordHash = "$2a$11$ChMwnQhCQRBdBXx7EeNfw.IdKVOQ4XPlSmG5YG.k5NcTeiUonjeHO",
                             Role = 0,
                             Username = "admin"
                         });
